@@ -62,10 +62,9 @@ function App() {
         setTimeout(() => {
           handleGenerate(attempt + 1);
         }, delay);
-        return; // Don't reset loading state
+        return;
       } else {
         console.error('Generation error:', errorMessage);
-        // Could show error toast here
       }
     } finally {
       setIsGenerating(false);
@@ -86,44 +85,43 @@ function App() {
   const handleHistoryItemSelect = useCallback((item: HistoryItem) => {
     setPrompt(item.prompt);
     setStyle(item.style);
-    // Set the generated image as the preview image for the live summary
     setImageDataUrl(item.imageUrl);
   }, []);
 
   return (
     <ErrorBoundary>
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
-        <div className="container mx-auto px-4 py-8">
+        <div className="container px-4 py-8 mx-auto">
           {/* Header */}
-          <header className="text-center mb-12">
+          <header className="mb-12 text-center">
             <div className="flex items-center justify-center gap-3 mb-4">
-              <div className="w-12 h-12 bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl flex items-center justify-center">
-                <Sparkles className="w-7 h-7 text-white" />
+              <div className="flex items-center justify-center w-12 h-12 bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl">
+                <Sparkles className="text-white w-7 h-7" />
               </div>
-              <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+              <h1 className="text-4xl font-bold text-transparent bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text">
                 AI Studio
               </h1>
             </div>
-            <p className="text-gray-600 text-lg max-w-2xl mx-auto">
+            <p className="max-w-2xl mx-auto text-lg text-gray-600">
               Transform your images with AI-powered creativity. Upload, describe, and generate stunning variations in seconds.
             </p>
           </header>
 
-          <div className="grid lg:grid-cols-3 gap-8">
+          <div className="grid gap-8 lg:grid-cols-3">
             {/* Left Column - Input Controls */}
-            <div className="lg:col-span-1 space-y-6">
-              <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <div className="space-y-6 lg:col-span-1">
+              <div className="p-6 bg-white border border-gray-200 shadow-sm rounded-xl">
                 <ImageUpload onImageUpload={setImageDataUrl} />
               </div>
 
-              <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+              <div className="p-6 bg-white border border-gray-200 shadow-sm rounded-xl">
                 <PromptInput 
                   value={prompt}
                   onChange={setPrompt}
                 />
               </div>
 
-              <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+              <div className="p-6 bg-white border border-gray-200 shadow-sm rounded-xl">
                 <StyleSelector 
                   value={style}
                   onChange={setStyle}
@@ -141,15 +139,15 @@ function App() {
             </div>
 
             {/* Right Column - Preview and History */}
-            <div className="lg:col-span-2 space-y-6">
+            <div className="space-y-6 lg:col-span-2">
               <LiveSummary
                 imageDataUrl={imageDataUrl}
                 prompt={prompt}
                 style={style}
-                className="bg-white rounded-xl shadow-sm border border-gray-200"
+                className="bg-white border border-gray-200 shadow-sm rounded-xl"
               />
 
-              <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+              <div className="p-6 bg-white border border-gray-200 shadow-sm rounded-xl">
                 <History
                   items={history}
                   onItemSelect={handleHistoryItemSelect}
@@ -159,7 +157,7 @@ function App() {
           </div>
 
           {/* Footer */}
-          <footer className="text-center mt-16 pt-8 border-t border-gray-200">
+          <footer className="pt-8 mt-16 text-center border-t border-gray-200">
             <p className="text-gray-500">
               AI Studio - Create stunning images with artificial intelligence
             </p>

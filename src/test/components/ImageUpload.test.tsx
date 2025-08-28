@@ -52,7 +52,6 @@ describe('ImageUpload', () => {
       },
     });
     
-    // Test that drag events are handled (no errors thrown)
     expect(dropArea).toBeInTheDocument();
   });
 
@@ -66,6 +65,5 @@ describe('ImageUpload', () => {
     expect(dropArea).toHaveFocus();
     
     await user.keyboard('{Enter}');
-    // Should trigger file dialog (we can't test the actual dialog opening)
   });
 });

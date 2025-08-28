@@ -1,7 +1,7 @@
 import '@testing-library/jest-dom';
 import { vi } from 'vitest';
 
-// Mock localStorage with proper implementation
+// Mock localStorage
 const localStorageMock = (() => {
   let store: Record<string, string> = {};
 
@@ -24,19 +24,16 @@ Object.defineProperty(window, 'localStorage', {
   writable: true,
 });
 
-// Mock URL.createObjectURL
 Object.defineProperty(URL, 'createObjectURL', {
   writable: true,
   value: vi.fn(() => 'mocked-url'),
 });
 
-// Mock URL.revokeObjectURL
 Object.defineProperty(URL, 'revokeObjectURL', {
   writable: true,
   value: vi.fn(),
 });
 
-// Mock FileReader
 Object.defineProperty(global, 'FileReader', {
   writable: true,
   value: class MockFileReader {
@@ -52,7 +49,6 @@ Object.defineProperty(global, 'FileReader', {
   },
 });
 
-// Mock image utils to avoid canvas issues
 vi.mock('../utils/imageUtils', () => ({
   resizeImage: vi.fn(() => Promise.resolve('data:image/jpeg;base64,resized-mock')),
   createImagePreview: vi.fn(() => Promise.resolve('data:image/jpeg;base64,preview-mock')),

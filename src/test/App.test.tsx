@@ -41,24 +41,19 @@ describe('App', () => {
     const user = userEvent.setup();
     render(<App />);
     
-    // Generate button should be disabled initially
     const generateButton = screen.getByRole('button', { name: /generate/i });
     expect(generateButton).toBeDisabled();
     
-    // Add prompt
     const promptInput = screen.getByLabelText(/prompt/i);
     await user.type(promptInput, 'A beautiful landscape');
     
-    // Button should still be disabled without image
     expect(generateButton).toBeDisabled();
     
-    // Mock file upload
     const fileInput = screen.getByLabelText(/upload image file/i);
     const file = new File(['test'], 'test.jpg', { type: 'image/jpeg' });
     
     await user.upload(fileInput, file);
     
-    // Wait for image processing
     await waitFor(() => {
       expect(generateButton).not.toBeDisabled();
     });
@@ -84,7 +79,6 @@ describe('App', () => {
     await user.type(promptInput, 'Test prompt');
     
     expect(screen.getByText('Live Preview')).toBeInTheDocument();
-    // Use more specific selector to target the prompt in the summary
     expect(screen.getByText('Test prompt', { selector: 'p' })).toBeInTheDocument();
     expect(screen.getByText('Editorial')).toBeInTheDocument();
   });
