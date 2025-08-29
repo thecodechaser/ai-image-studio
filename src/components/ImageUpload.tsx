@@ -6,11 +6,28 @@ interface ImageUploadProps {
   onImageUpload: (dataUrl: string) => void;
   imageDataUrl?: string;
   className?: string;
+  isHistorySelected?: boolean;
+  setIsHistorySelected: (selected: boolean) => void;
+  setPrompt: (prompt: string) => void;
 }
 
-export const ImageUpload: React.FC<ImageUploadProps> = ({ onImageUpload, imageDataUrl, className = '' }) => {
+export const ImageUpload: React.FC<ImageUploadProps> = ({
+  onImageUpload,
+  imageDataUrl,
+  className = '',
+  isHistorySelected,
+  setIsHistorySelected,
+  setPrompt
+}) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const { uploadedImage, isProcessing, error, handleFileUpload, clearImage, setImage } = useImageUpload();
+  const {
+    uploadedImage,
+    isProcessing,
+    error,
+    handleFileUpload,
+    clearImage,
+    setImage,
+  } = useImageUpload();
 
   React.useEffect(() => {
     if (!imageDataUrl) {
@@ -19,7 +36,9 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({ onImageUpload, imageDa
         fileInputRef.current.value = '';
       }
     } else if (imageDataUrl && !uploadedImage) {
-      const mockFile = new File([''], 'selected-image.jpg', { type: 'image/jpeg' });
+      const mockFile = new File([''], 'selected-image.jpg', {
+        type: 'image/jpeg',
+      });
       const mockUploadedImage = {
         file: mockFile,
         dataUrl: imageDataUrl,
@@ -34,6 +53,8 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({ onImageUpload, imageDa
     if (!file) return;
 
     await handleFileUpload(file);
+    setIsHistorySelected(false);
+    setPrompt('');
   };
 
   const handleDrop = async (e: React.DragEvent<HTMLDivElement>) => {
@@ -70,7 +91,7 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({ onImageUpload, imageDa
     <div className={`space-y-4 ${className}`}>
       <div className="flex items-center justify-between">
         <h3 className="text-lg font-semibold text-gray-900">Upload Image</h3>
-        {uploadedImage && (
+        {uploadedImage && !isHistorySelected && (
           <button
             onClick={handleClear}
             className="p-1 text-red-600 transition-colors rounded-md hover:text-red-700 focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
@@ -87,7 +108,7 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({ onImageUpload, imageDa
         </div>
       )}
 
-      {!uploadedImage ? (
+      {!uploadedImage || isHistorySelected ? (
         <div
           onDrop={handleDrop}
           onDragOver={handleDragOver}
@@ -112,7 +133,10 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({ onImageUpload, imageDa
             <>
               <Upload className="w-12 h-12 mx-auto mb-4 text-gray-400" />
               <p className="mb-2 text-gray-600">
-                <span className="font-semibold text-blue-600">Click to upload</span> or drag and drop
+                <span className="font-semibold text-blue-600">
+                  Click to upload
+                </span>{' '}
+                or drag and drop
               </p>
               <p className="text-sm text-gray-500">PNG or JPG (max 10MB)</p>
             </>

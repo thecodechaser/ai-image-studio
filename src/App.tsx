@@ -20,62 +20,78 @@ function App() {
   const [style, setStyle] = useState<StyleOption>('Editorial');
   const [isGenerating, setIsGenerating] = useState(false);
   const [currentAttempt, setCurrentAttempt] = useState(1);
-  const [currentRequest, setCurrentRequest] = useState<ReturnType<typeof createAbortableMockApiCall> | null>(null);
-  const [history, setHistory] = useLocalStorage<HistoryItem[]>('ai-studio-history', []);
+  const [currentRequest, setCurrentRequest] = useState<ReturnType<
+    typeof createAbortableMockApiCall
+  > | null>(null);
+  const [history, setHistory] = useLocalStorage<HistoryItem[]>(
+    'ai-studio-history',
+    []
+  );
+  const [isHistorySelected, setIsHistorySelected] = useState(false);
 
   const canGenerate = imageDataUrl && prompt.trim();
 
-  const addToHistory = useCallback((item: HistoryItem) => {
-    setHistory(prev => {
-      const newHistory = [item, ...prev.filter(h => h.id !== item.id)];
-      return newHistory.slice(0, MAX_HISTORY_ITEMS);
-    });
-  }, [setHistory]);
+  const addToHistory = useCallback(
+    (item: HistoryItem) => {
+      setHistory((prev) => {
+        const newHistory = [item, ...prev.filter((h) => h.id !== item.id)];
+        return newHistory.slice(0, MAX_HISTORY_ITEMS);
+      });
+    },
+    [setHistory]
+  );
 
-  const handleGenerate = useCallback(async (attempt: number = 1) => {
-    if (!canGenerate || isGenerating) return;
+  const handleGenerate = useCallback(
+    async (attempt: number = 1) => {
+      if (!canGenerate || isGenerating) return;
 
-    setIsGenerating(true);
-    setCurrentAttempt(attempt);
+      setIsGenerating(true);
+      setCurrentAttempt(attempt);
 
-    const request: GenerationRequest = {
-      imageDataUrl,
-      prompt: prompt.trim(),
-      style,
-    };
+      const request: GenerationRequest = {
+        imageDataUrl,
+        prompt: prompt.trim(),
+        style,
+      };
 
-    const abortableRequest = createAbortableMockApiCall(request);
-    setCurrentRequest(abortableRequest);
+      const abortableRequest = createAbortableMockApiCall(request);
+      setCurrentRequest(abortableRequest);
 
-    try {
-      const response = await abortableRequest.promise;
-      addToHistory(response);
-      
-      // Reset to initial state after successful generation
-      setPrompt('');
-      setImageDataUrl('');
-      setCurrentRequest(null);
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Generation failed';
-      
-      if (errorMessage === 'Request aborted') {
-        console.log('Generation was aborted by user');
-      } else if (errorMessage === 'Model overloaded' && attempt < MAX_RETRY_ATTEMPTS) {
-        // Exponential backoff: 1s, 2s, 4s
-        const delay = Math.pow(2, attempt - 1) * 1000;
-        setTimeout(() => {
-          handleGenerate(attempt + 1);
-        }, delay);
-        return;
-      } else {
-        console.error('Generation error:', errorMessage);
+      try {
+        const response = await abortableRequest.promise;
+        addToHistory(response);
+
+        // Reset to initial state after successful generation
+        setPrompt('');
+        setImageDataUrl('');
+        setCurrentRequest(null);
+      } catch (error) {
+        const errorMessage =
+          error instanceof Error ? error.message : 'Generation failed';
+
+        if (errorMessage === 'Request aborted') {
+          console.log('Generation was aborted by user');
+        } else if (
+          errorMessage === 'Model overloaded' &&
+          attempt < MAX_RETRY_ATTEMPTS
+        ) {
+          // Exponential backoff: 1s, 2s, 4s
+          const delay = Math.pow(2, attempt - 1) * 1000;
+          setTimeout(() => {
+            handleGenerate(attempt + 1);
+          }, delay);
+          return;
+        } else {
+          console.error('Generation error:', errorMessage);
+        }
+      } finally {
+        setIsGenerating(false);
+        setCurrentAttempt(1);
+        setCurrentRequest(null);
       }
-    } finally {
-      setIsGenerating(false);
-      setCurrentAttempt(1);
-      setCurrentRequest(null);
-    }
-  }, [canGenerate, isGenerating, imageDataUrl, prompt, style, addToHistory]);
+    },
+    [canGenerate, isGenerating, imageDataUrl, prompt, style, addToHistory]
+  );
 
   const handleAbort = useCallback(() => {
     if (currentRequest) {
@@ -90,6 +106,7 @@ function App() {
     setPrompt(item.prompt);
     setStyle(item.style);
     setImageDataUrl(item.imageUrl);
+    setIsHistorySelected(true);
   }, []);
 
   return (
@@ -121,7 +138,8 @@ function App() {
               </h1>
             </div>
             <p className="max-w-2xl mx-auto text-lg text-gray-600">
-              Transform your images with AI-powered creativity. Upload, describe, and generate stunning variations in seconds.
+              Transform your images with AI-powered creativity. Upload,
+              describe, and generate stunning variations in seconds.
             </p>
           </header>
 
@@ -129,21 +147,21 @@ function App() {
             {/* Left Column - Input Controls */}
             <div className="space-y-6 lg:col-span-1">
               <div className="p-6 bg-white border border-gray-200 shadow-sm rounded-xl">
-                <ImageUpload onImageUpload={setImageDataUrl} imageDataUrl={imageDataUrl} />
-              </div>
-
-              <div className="p-6 bg-white border border-gray-200 shadow-sm rounded-xl">
-                <PromptInput 
-                  value={prompt}
-                  onChange={setPrompt}
+                <ImageUpload
+                  onImageUpload={setImageDataUrl}
+                  imageDataUrl={imageDataUrl}
+                  isHistorySelected={isHistorySelected}
+                  setIsHistorySelected={setIsHistorySelected}
+                  setPrompt={setPrompt}
                 />
               </div>
 
               <div className="p-6 bg-white border border-gray-200 shadow-sm rounded-xl">
-                <StyleSelector 
-                  value={style}
-                  onChange={setStyle}
-                />
+                <PromptInput value={prompt} onChange={setPrompt}  isHistorySelected={isHistorySelected} />
+              </div>
+
+              <div className="p-6 bg-white border border-gray-200 shadow-sm rounded-xl">
+                <StyleSelector value={style} onChange={setStyle} />
               </div>
 
               <GenerateButton
