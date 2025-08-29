@@ -10,6 +10,7 @@ import { History } from './components/History';
 import { useLocalStorage } from './hooks/useLocalStorage';
 import { createAbortableMockApiCall } from './utils/mockApi';
 import { StyleOption, HistoryItem, GenerationRequest } from './types';
+import { Footer } from './components/Footer';
 
 const MAX_HISTORY_ITEMS = 5;
 const MAX_RETRY_ATTEMPTS = 3;
@@ -113,13 +114,13 @@ function App() {
     <ErrorBoundary>
       {/* Sticky Header */}
       <div className="sticky top-0 z-50 border-b border-gray-200 bg-white/80 backdrop-blur-md">
-        <div className="container px-4 py-3 mx-auto">
-          <div className="flex items-center justify-center gap-2">
+        <div className="container px-4 py-3 ml-4 lg:ml-10">
+          <div className="flex gap-2">
             <div className="flex items-center justify-center w-6 h-6 rounded-lg bg-gradient-to-r from-blue-600 to-purple-600">
               <Sparkles className="w-4 h-4 text-white" />
             </div>
             <h1 className="text-lg font-bold text-transparent bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text">
-              AI Studio
+              AI Image Studio
             </h1>
           </div>
         </div>
@@ -134,7 +135,7 @@ function App() {
                 <Sparkles className="text-white w-7 h-7" />
               </div>
               <h1 className="text-4xl font-bold text-transparent bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text">
-                AI Studio
+                AI Image Studio
               </h1>
             </div>
             <p className="max-w-2xl mx-auto text-lg text-gray-600">
@@ -143,7 +144,7 @@ function App() {
             </p>
           </header>
 
-          <div className="grid gap-8 lg:grid-cols-3">
+          <div className="grid gap-10 mb-6 lg:grid-cols-3">
             {/* Left Column - Input Controls */}
             <div className="space-y-6 lg:col-span-1">
               <div className="p-6 bg-white border border-gray-200 shadow-sm rounded-xl">
@@ -157,7 +158,11 @@ function App() {
               </div>
 
               <div className="p-6 bg-white border border-gray-200 shadow-sm rounded-xl">
-                <PromptInput value={prompt} onChange={setPrompt}  isHistorySelected={isHistorySelected} />
+                <PromptInput
+                  value={prompt}
+                  onChange={setPrompt}
+                  isHistorySelected={isHistorySelected}
+                />
               </div>
 
               <div className="p-6 bg-white border border-gray-200 shadow-sm rounded-xl">
@@ -193,11 +198,7 @@ function App() {
           </div>
 
           {/* Footer */}
-          <footer className="pt-8 mt-16 text-center border-t border-gray-200">
-            <p className="text-gray-500">
-              AI Studio - Create stunning images with artificial intelligence
-            </p>
-          </footer>
+          <Footer />
         </div>
       </div>
     </ErrorBoundary>
