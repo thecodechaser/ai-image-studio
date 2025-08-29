@@ -45,11 +45,16 @@ export const useImageUpload = () => {
     setError(null);
   }, []);
 
+  const setImage = useCallback((image: UploadedImage | null) => {
+    setUploadedImage(image);
+  }, []);
+
   return {
     uploadedImage,
     isProcessing,
     error,
     handleFileUpload,
     clearImage,
+    setImage,
   };
 };

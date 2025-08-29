@@ -50,6 +50,10 @@ function App() {
     try {
       const response = await abortableRequest.promise;
       addToHistory(response);
+      
+      // Reset to initial state after successful generation
+      setPrompt('');
+      setImageDataUrl('');
       setCurrentRequest(null);
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Generation failed';
@@ -90,6 +94,20 @@ function App() {
 
   return (
     <ErrorBoundary>
+      {/* Sticky Header */}
+      <div className="sticky top-0 z-50 border-b border-gray-200 bg-white/80 backdrop-blur-md">
+        <div className="container px-4 py-3 mx-auto">
+          <div className="flex items-center justify-center gap-2">
+            <div className="flex items-center justify-center w-6 h-6 rounded-lg bg-gradient-to-r from-blue-600 to-purple-600">
+              <Sparkles className="w-4 h-4 text-white" />
+            </div>
+            <h1 className="text-lg font-bold text-transparent bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text">
+              AI Studio
+            </h1>
+          </div>
+        </div>
+      </div>
+
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
         <div className="container px-4 py-8 mx-auto">
           {/* Header */}
@@ -111,7 +129,7 @@ function App() {
             {/* Left Column - Input Controls */}
             <div className="space-y-6 lg:col-span-1">
               <div className="p-6 bg-white border border-gray-200 shadow-sm rounded-xl">
-                <ImageUpload onImageUpload={setImageDataUrl} />
+                <ImageUpload onImageUpload={setImageDataUrl} imageDataUrl={imageDataUrl} />
               </div>
 
               <div className="p-6 bg-white border border-gray-200 shadow-sm rounded-xl">

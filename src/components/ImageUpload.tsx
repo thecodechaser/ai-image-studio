@@ -4,12 +4,30 @@ import { useImageUpload } from '../hooks/useImageUpload';
 
 interface ImageUploadProps {
   onImageUpload: (dataUrl: string) => void;
+  imageDataUrl?: string;
   className?: string;
 }
 
-export const ImageUpload: React.FC<ImageUploadProps> = ({ onImageUpload, className = '' }) => {
+export const ImageUpload: React.FC<ImageUploadProps> = ({ onImageUpload, imageDataUrl, className = '' }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const { uploadedImage, isProcessing, error, handleFileUpload, clearImage } = useImageUpload();
+  const { uploadedImage, isProcessing, error, handleFileUpload, clearImage, setImage } = useImageUpload();
+
+  React.useEffect(() => {
+    if (!imageDataUrl) {
+      clearImage();
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    } else if (imageDataUrl && !uploadedImage) {
+      const mockFile = new File([''], 'selected-image.jpg', { type: 'image/jpeg' });
+      const mockUploadedImage = {
+        file: mockFile,
+        dataUrl: imageDataUrl,
+        preview: imageDataUrl,
+      };
+      setImage(mockUploadedImage);
+    }
+  }, [imageDataUrl, uploadedImage, clearImage, setImage]);
 
   const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -36,6 +54,7 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({ onImageUpload, classNa
 
   const handleClear = () => {
     clearImage();
+    onImageUpload('');
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
@@ -54,7 +73,7 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({ onImageUpload, classNa
         {uploadedImage && (
           <button
             onClick={handleClear}
-            className="text-red-600 hover:text-red-700 p-1 rounded-md transition-colors focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+            className="p-1 text-red-600 transition-colors rounded-md hover:text-red-700 focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
             aria-label="Clear uploaded image"
           >
             <X className="w-5 h-5" />
@@ -63,8 +82,8 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({ onImageUpload, classNa
       </div>
 
       {error && (
-        <div className="bg-red-50 border border-red-200 rounded-md p-3">
-          <p className="text-red-800 text-sm">{error}</p>
+        <div className="p-3 border border-red-200 rounded-md bg-red-50">
+          <p className="text-sm text-red-800">{error}</p>
         </div>
       )}
 
@@ -73,7 +92,7 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({ onImageUpload, classNa
           onDrop={handleDrop}
           onDragOver={handleDragOver}
           onClick={openFileDialog}
-          className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center cursor-pointer hover:border-blue-400 hover:bg-blue-50 transition-all duration-200 focus-within:ring-2 focus-within:ring-blue-500 focus-within:ring-offset-2"
+          className="p-8 text-center transition-all duration-200 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer hover:border-blue-400 hover:bg-blue-50 focus-within:ring-2 focus-within:ring-blue-500 focus-within:ring-offset-2"
           role="button"
           tabIndex={0}
           onKeyDown={(e) => {
@@ -86,13 +105,13 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({ onImageUpload, classNa
         >
           {isProcessing ? (
             <div className="flex items-center justify-center space-x-2">
-              <div className="w-6 h-6 border-2 border-blue-600 border-t-transparent rounded-full animate-spin" />
+              <div className="w-6 h-6 border-2 border-blue-600 rounded-full border-t-transparent animate-spin" />
               <span className="text-blue-600">Processing image...</span>
             </div>
           ) : (
             <>
-              <Upload className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-              <p className="text-gray-600 mb-2">
+              <Upload className="w-12 h-12 mx-auto mb-4 text-gray-400" />
+              <p className="mb-2 text-gray-600">
                 <span className="font-semibold text-blue-600">Click to upload</span> or drag and drop
               </p>
               <p className="text-sm text-gray-500">PNG or JPG (max 10MB)</p>
@@ -101,11 +120,11 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({ onImageUpload, classNa
         </div>
       ) : (
         <div className="relative">
-          <div className="bg-gray-100 rounded-lg overflow-hidden h-64">
+          <div className="h-64 overflow-hidden bg-gray-100 rounded-lg">
             <img
               src={uploadedImage.preview}
               alt="Uploaded preview"
-              className="w-full h-full object-contain"
+              className="object-contain w-full h-full"
             />
           </div>
           <div className="mt-2 text-sm text-gray-600">
