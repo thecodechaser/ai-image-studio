@@ -22,27 +22,6 @@
 - Vite
 - Tailwind CSS
 
-## Design Notes
-
-- **Layout:** The UI is split into two main sections:  
-  - Left side: Upload image, enter prompt, and choose style.  
-  - Right side: Live preview with recent generations history.  
-  This provides a clear workflow from input → preview → history.  
-
-- **Styling:** TailwindCSS is used for a clean, modern interface with responsive spacing, typography, and visible focus states for accessibility.  
-
-- **Accessibility:** All interactive elements (upload, dropdown, buttons) are keyboard navigable with ARIA labels where appropriate.  
-
-- **Image Handling:** Client-side downscaling ensures uploaded images ≤1920px before sending, keeping performance smooth.  
-
-- **Error Handling:** The mocked API introduces simulated latency and errors. Automatic retries with exponential backoff are implemented, along with an **Abort** option for in-flight requests.  
-
-- **History:** The last 5 generations are stored in `localStorage` and displayed with timestamp, prompt, and style. Clicking restores them in the preview.  
-
-- **Performance Optimizations:** Memoization is used in components where needed, and assets are split to keep bundle size lean.  
-
----
-
 ## Live version
 
 [AI Image Studio](https://ai-image.thecodechaser.com)
